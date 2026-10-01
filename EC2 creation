@@ -1,0 +1,55 @@
+resource "aws_vpc" "vpc1" {
+    cidr_block = var.vpc1_cidr
+    tags = {
+      Name = var.vpc1_name
+    }
+}
+resource "aws_subnet" "sub1" {
+  vpc_id  = aws_vpc.vpc1.id
+  cidr_block = var.sub1_cidr
+  tags = {
+    Name = var.sub1_name
+  }
+}
+
+# internet Gateway
+
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.vpc1.id
+  tags = {
+    Name = var.IGW_name
+  }
+}
+
+# route table
+resource "aws_route_table" "rt1" {
+  vpc_id = aws_vpc.vpc1.id
+  tags = {
+    Name = var.rt1_name
+  }
+}
+# subnet Association
+resource "aws_route_table_association" "rta1" {
+  subnet_id      = aws_subnet.sub1.id
+  route_table_id = aws_route_table.rt1.id
+}
+
+# routes
+resource "aws_route" "route1" {
+  route_table_id         = aws_route_table.rt1.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.igw.id
+}
+
+# Ec2 create 
+
+resorce "aws_instance" "web1" {
+  ami           = var.ami_id
+  instance_type = var.instance_type
+  subnet_id     = aws_subnet.sub1.id
+  key_name     = var.key_name
+  associate_public_ip_address = true
+  tags = {
+    Name = var.web_name
+  }
+}
