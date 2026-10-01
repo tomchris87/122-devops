@@ -1,0 +1,15 @@
+pipeline{
+    agent any
+    stages {
+        stage("clone"){
+            steps {
+                git 'https://github.com/tomchris87/122-devops.git'
+            }
+        }    
+        stage("rename"){
+            steps {
+                sh 'mv kotak ICICI'
+            }
+        }
+    }
+}
